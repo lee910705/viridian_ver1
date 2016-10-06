@@ -4,6 +4,50 @@
     var app = angular.module('myApp.dashboard', ['ngRoute', 'firebase.utils', 'firebase']);
 
     app.controller('DashboardCtrl', function ($scope, $q, $firebaseObject) {
+
+        /*
+
+        Format stuff - mostly overriding bootstrap
+
+        */
+
+        // override navbar styles
+        var navBar = d3.select('.navbar-light')
+        navBar.style({
+
+            'position': 'absolute',
+            'left': '0px',
+            'top': '0px',
+
+            'width': '100%',
+            'background-color': 'rgba(43, 78, 71, 1)',
+            'font-family': 'Roboto Condensed, Helvetica',
+            'font-weight': 600
+
+        });
+
+        navBar.selectAll('a')
+            .style({ 'color': 'rgba(128,128,128,1)' })
+            .on('mouseover', function(d,i){
+                d3.select(this).style({ 'color': 'rgba(1,1,1,1)' })
+            })
+            .on('mouseout', function(d,i){
+                d3.select(this).style({ 'color': 'rgba(128,128,128,1)' })
+            });
+
+        d3.selectAll('.navbar-brand')
+            .append('text')
+            .text('VIRIDIAN')
+            .style({
+                'font-size': '1.6em'
+            });
+
+        /*
+
+        File traffic & loading
+
+        */
+
         //$scope.jsonHeatMap = {};
         var objectHeatMap = [];
 
@@ -350,6 +394,12 @@
         var snapshot = $firebaseObject(ref);
         var defer = $q.defer();
 
+        /*
+
+        Primary run sequenced - scheduled using $q.all()
+
+        */
+
         // Load the heatmap data and append it to svg
         ref.on("value", function (snapshot) {
             angular.forEach(snapshot.val(), function (entry) {
@@ -446,7 +496,13 @@
             defer.resolve(objectHeatMap);
             $q.all(objectHeatMap).then(function () {
 
-                console.log("After grabbing data");
+                /*
+
+                Calendar heat map
+
+                */
+
+                // console.log("After grabbing data");
                 var margin = {top: 5.5, right: 0, bottom: 5.5, left: 19.5},
                     width = 960 - margin.left - margin.right,
                     height = 130 - margin.top - margin.bottom,
@@ -488,16 +544,26 @@
                     .attr("class", "heatMap")
                     .style({
                         "position": "relative",
-                        "top": function(){return sankeyHeight + "px"}
+                        "top": function(){return sankeyHeight + "px";},
+                        "left": function(){return svgPadding + 'px';}
                     })
                     .attr("width", width + margin.left + margin.right)
                     .attr("height", height + margin.top + margin.bottom)
                     .append("g")
                     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-                svg.append("text")
-                    .attr("transform", "translate(-6," + size * 3.5 + ")rotate(-90)")
-                    .attr("text-anchor", "middle")
+                d3.select('.heatMap')
+                    .append('g')
+                    .attr({
+                        'transform': 'translate(15,55) rotate(270)',
+                        'id': 'labelText'
+                    })
+                    .append("text")
+                    .style({
+                        'font-size': '2em',
+                        'font-weight': '600',
+                        'fill': 'rgba(43, 78, 71, 1)'
+                    })
                     .text(function (d) {
                         return d;
                     });
@@ -583,6 +649,12 @@
                         + "H" + (w0 + 1) * size + "Z";
                 }
 
+                /*
+
+                Sankey chart
+
+                */
+
                 // get the party started
                 $scope.sankeyTime = function(nodes){
                     var sankeyTime = d3.sankey()
@@ -624,9 +696,9 @@
                                     yInterpolator = d3.interpolateNumber(0, sankeyHeight - tallestNode),
                                     y = 0;
                                 if (i <= nodes.length / 2) {
-                                    y = yInterpolator(i / nodes.length) + (svgPadding * 2);
+                                    y = yInterpolator(i / nodes.length) + (svgPadding);
                                 } else {
-                                    y = yInterpolator((nodes.length - i) / nodes.length) + (svgPadding * 2);
+                                    y = yInterpolator((nodes.length - i) / nodes.length) + (svgPadding);
                                 }
 
                                 d.x += svgPadding;
@@ -832,13 +904,13 @@
                     .append('text')
                     .attr({
                         'x': svgPadding,
-                        'y': svgPadding + 40
+                        'y': svgPadding + 10
                     })
                     .style({
-                        'font-size': 40,
+                        'font-size': '2.4em',
                         'font-family': 'Roboto',
                         'font-weight': 600,
-                        'fill': 'rgba(0,0,0,0.8)'
+                        'fill': 'rgba(43, 78, 71, 1)'
                     })
                     .text('Overall system status');
 
