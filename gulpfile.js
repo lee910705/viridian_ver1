@@ -20,7 +20,7 @@ var paths = {
     //],
 
     scripts: [
-        APP + 'fireflow.js',
+        APP + '**/*.js',
         SRC + '**/*.js',
         '!' + APP + 'lib/**/*.js',
         '!' + APP + '**/*_mock.js',

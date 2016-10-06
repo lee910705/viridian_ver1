@@ -1,18 +1,48 @@
 ﻿<!doctype html>
 <html lang="en" ng-app="myApp">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Viridian Mark 0</title>
-  <meta name="description" content="">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="bower_components/html5-boilerplate/css/normalize.css">
-  <link rel="stylesheet" href="bower_components/html5-boilerplate/css/main.css">
-  <link rel="stylesheet" href="app.css"/>
-  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <script src="bower_components/html5-boilerplate/js/vendor/modernizr-2.6.2.min.js"></script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Viridian Mark 0</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="bower_components/html5-boilerplate/css/normalize.css">
+    <link rel="stylesheet" href="bower_components/html5-boilerplate/css/main.css">
+    <link rel="stylesheet" href="app.css"/>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="bower_components/html5-boilerplate/js/vendor/modernizr-2.6.2.min.js"></script>
 
+    <!-- In production use:
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.x/angular.min.js"></script>
+  <script src="//cdn.firebase.com/js/client/2.2.x/firebase.js"></script>
+  <script src="//cdn.firebase.com/libs/angularfire/1.0.x/angularfire.min.js"></script>
+        -->
+    <!-- Latest compiled and minified CSS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js" charset="utf-8"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
 
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular-route/angular-route.js"></script>
+    <script src="bower_components/firebase/firebase.js"></script>
+    <script src="bower_components/angularfire/dist/angularfire.js"></script>
+    <script src="lib/d3.js"></script>
+
+    <script src="app.js"></script>
+    <script src="config.js"></script>
+
+    <script src="components/appversion/appversion-directive.js"></script>
+    <script src="components/firebase.utils/firebase.utils.js"></script>
+    <script src="components/ngcloak/ngcloak-decorator.js"></script>
+    <script src="components/reverse/reverse-filter.js"></script>
+    <script src="components/security/security.js"></script>
+    <script src="dashboard/dashboard.js"></script>
+    <script src="runoff/runoff.js"></script>
+    <script src="calendarEntry/calendarEntry.js"></script>
+    <!-- <script src="lib/sankey.js"></script> -->
+    <!-- <script src="lib/heatmap.js"></script> -->
 </head>
 <body>
 <!--
@@ -34,69 +64,27 @@
 <link href="navbar.css" rel="stylesheet">
 
 <div class="container">
-  <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
-    <div class="navbar-toggleable-xs" id="navbar-header">
-      <a class="navbar-brand">Viridian</a>
-      <ul class="nav navbar-nav">
-        <li class="nav-item active">
-          <a class="nav-link" href="#/dashboard">Home <span class="sr-only">(current)</span></a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#/runoff">Run off sheet</a>
-        </li>
-      </ul>
+    <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
+        <div class="navbar-toggleable-xs" id="navbar-header">
+            <a class="navbar-brand">Viridian</a>
+            <ul class="nav navbar-nav">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#/dashboard">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#/runoff">Run off sheet</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#/calendarEntry">Calendar program entry</a>
+                </li>
+            </ul>
 
-    </div>
-  </nav> <!-- /navbar -->
-<!--
-  <nav class="navbar navbar-fixed-top navbar-dark bg-inverse">
-    <div>
-    <a class="navbar-brand" href="#/dashboard">Viridian</a>
-    <ul class="nav navbar-nav">
-      <li class="nav-item active">
-        <a class="nav-link" href="#/dashboard">Home <span class="sr-only">(current)</span></a>
-      </li>
-      <li class="nav-item active">
-        <a class="nav-link" href="#/runoff">Run off sheet input<span class="sr-only">(current)</span></a>
-      </li>
-    </ul>
-      </div>
-  </nav>
--->
+        </div>
+    </nav>
 
-  <div ng-view></div>
+    <div ng-view></div>
 
-
-  <!-- In production use:
-<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.x/angular.min.js"></script>
-<script src="//cdn.firebase.com/js/client/2.2.x/firebase.js"></script>
-<script src="//cdn.firebase.com/libs/angularfire/1.0.x/angularfire.min.js"></script>
-      -->
-  <!-- Latest compiled and minified CSS -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js" charset="utf-8"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
-
-
-  <script src="bower_components/angular/angular.js"></script>
-  <script src="bower_components/angular-route/angular-route.js"></script>
-  <script src="bower_components/firebase/firebase.js"></script>
-  <script src="bower_components/angularfire/dist/angularfire.js"></script>
-
-  <script src="app.js"></script>
-  <script src="config.js"></script>
-
-  <script src="components/appversion/appversion-directive.js"></script>
-  <script src="components/firebase.utils/firebase.utils.js"></script>
-  <script src="components/ngcloak/ngcloak-decorator.js"></script>
-  <script src="components/reverse/reverse-filter.js"></script>
-  <script src="components/security/security.js"></script>
-  <script src="dashboard/dashboard.js"></script>
-  <script src="runoff/runoff.js"></script>
-  <script src="calendarEntry/calendarEntry.js"></script>
-
+</div>
 
 </body>
 </html>
