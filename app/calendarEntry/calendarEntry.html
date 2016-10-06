@@ -1,0 +1,58 @@
+<div ng-controller="CalendarEntryCtrl">
+    <h2>Calendar Program Entry</h2>
+
+
+
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+            {{currentPhase}}
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a ng-click='changePhase("ROOT")'>ROOT</a></li>
+            <li><a ng-click='changePhase("VEG")'>VEG</a></li>
+            <li><a ng-click='changePhase("FLOWER")'>FLOWER</a></li>
+            <li><a ng-click='changePhase("TRIM")'>TRIM</a></li>
+        </ul>
+    </div>
+
+    <div class="form-row show-inputbtns">
+        Start Date : <input type="date" ng-model="startDate" data-date-inline-picker="false" data-date-popover='{"inline": true}'>
+    </div>
+    <form>
+        <!--<input placeholder="Phase" ng-model="phase" >-->
+        
+        <input placeholder="Day" ng-model="day">
+        <input placeholder="Hours" ng-model="hours">
+        <input placeholder="Task" ng-model="task">
+        <button type="submit" ng-click="addTask(currentPhase, day, hours, task);showTask(currentPhase);day = null; hours = null; task = null;">Add task</button>
+    </form>
+
+    <table class="table" id="tasks" ng-show="tasks">
+        <thead>
+            <tr>
+                <th>Day</th>
+                <th>Hours</th>
+                <th>Task</th>
+            </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="entry in program[currentPhase] | orderBy: 'day'"><td>{{entry['day']}}</td> <td>{{entry['hours']}}</td> <td>{{entry['task']}}</td></tr>
+    </table>
+
+    <button type="submit" ng-click="addStartDate(startDate);addProgram();showTask('ROOT');startDate = null;">Add program</button>
+</div>
+<!--
+<form>
+  <input placeholder="DATE" ng-model="newDATE">
+  <input placeholder="INPT" ng-model="newINPT">
+  <input placeholder="PREF" ng-model="newPREF">
+  <input placeholder="PH" ng-model="newPH">
+  <input placeholder="EC" ng-model="newEC">
+  <button type="submit" ng-click="addrunoff(newDATE, newINPT, newPREF, newPH, newEC);newDATE = null; newINPT = null; newPREF = null; newPH = null; newEC = null;">send</button>
+</form>
+
+<ul id="runoffs" ng-show="runoffs.length">
+    <li ng-repeat="runoff in runoffs | reverse">{{runoff.DATE}}</li>
+</ul>
+    -->

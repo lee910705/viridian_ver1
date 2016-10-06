@@ -1,0 +1,24 @@
+<h2>Runoff</h2>
+
+<form>
+  <input placeholder="DATE" ng-model="newDATE">
+  <input placeholder="INPT" ng-model="newINPT">
+  <input placeholder="PREF" ng-model="newPREF">
+  <input placeholder="PH" ng-model="newPH">
+  <input placeholder="EC" ng-model="newEC">
+  <button type="submit" ng-click="addrunoff(newDATE, newINPT, newPREF, newPH, newEC);newDATE = null; newINPT = null; newPREF = null; newPH = null; newEC = null;">Enter</button>
+</form>
+
+<table class="table" id="runoffs" ng-show="runoffs.length">
+    <thead>
+    <tr>
+        <th>DATE</th>
+        <th>INPT</th>
+        <th>PREF</th>
+        <th>PH</th>
+        <th>EC</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="runoff in runoffs | reverse"><td>{{runoff.DATE}}</td> <td>{{runoff.INPT}}</td> <td>{{runoff.PREF}}</td><td>{{runoff.PH}}</td><td>{{runoff.EC}}</td></tr>
+</table>
