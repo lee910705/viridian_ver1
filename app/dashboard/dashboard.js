@@ -48,7 +48,7 @@
                 'position': 'absolute',
                 'right': '175px',
                 'top': '105px',
-                'font-family': 'Roboto Condensed',
+                'font-family': 'Roboto Condensed, Helvetica',
                 'width': '100px',
                 'font-size': '1em',
                 'list-style': 'none'
@@ -827,7 +827,7 @@
                     .attr({
                         'x': function(d){return 0 - d.dy},
                         'y': 20,
-                        'font-family': 'Roboto',
+                        'font-family': 'Roboto, Helvetica',
                         'font-size': svgPadding,
                         'fill-opacity': 0.4,
                         'font-weight': 600,
@@ -841,7 +841,7 @@
                         'x': 35,
                         'y': 15,
                         'dy': 12,
-                        'font-family': 'Roboto',
+                        'font-family': 'Roboto, Helvetica',
                         'font-size': '3em',
                         'fill-opacity': 0.4,
                         'font-weight': 600,
@@ -1039,7 +1039,7 @@
             })
             .style({
                 'font-size': '2.4em',
-                'font-family': 'Roboto',
+                'font-family': 'Roboto, Helvetica',
                 'font-weight': 600,
                 'fill': 'rgba(43, 78, 71, 1)'
             })
@@ -1053,7 +1053,7 @@
             })
             .style({
                 'font-size': '2.4em',
-                'font-family': 'Roboto',
+                'font-family': 'Roboto, Helvetica',
                 'font-weight': 600,
                 'fill': 'rgba(43, 78, 71, 1)'
             })
@@ -1085,7 +1085,7 @@
                 .append('xhtml:div')
                 .style({
                     'font-size': '2em',
-                    'font-family': 'Roboto Condensed'
+                    'font-family': 'Roboto Condensed, Helvetica'
                 })
                 .html(function(){
                     var start = '<div>',
@@ -1103,7 +1103,7 @@
 
                 d3.select('#messagesHeader')
                     .style({
-                        'font-family': 'Roboto',
+                        'font-family': 'Roboto, Helvetica',
                         'font-size': '1.2em',
                         'font-weight': 600
                     })
