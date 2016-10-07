@@ -3,9 +3,16 @@
 
     var app = angular.module('myApp.dashboard', ['ngRoute', 'firebase.utils', 'firebase']);
 
-    app.controller('DashboardCtrl', function ($scope, $q, $firebaseObject, $firebaseArray) {
+    app.controller('DashboardCtrl', function ($scope, $q, messageList, $firebaseObject, $firebaseArray) {
 
         d3.select("svg").remove();
+        $scope.messages = messageList;
+        $scope.addMessage = function (newMessage) {
+            console.log("called");
+            if (newMessage) {
+                $scope.messages.$add({ text: newMessage });
+            }
+        };
 
         /*
 
@@ -1053,6 +1060,12 @@
     });
 
     var ref = new Firebase("https://viridian-49902.firebaseio.com/calendarEntries");
+
+
+    app.factory('messageList', ['fbutil', '$firebaseArray', function(fbutil, $firebaseArray) {
+        var ref = fbutil.ref('messages');
+        return $firebaseArray(ref);
+    }]);
 
     app.config(['$routeProvider', function ($routeProvider) {
         $routeProvider.when('/dashboard', {
