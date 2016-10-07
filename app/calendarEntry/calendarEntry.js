@@ -4,8 +4,7 @@
     var app = angular.module('myApp.calendarEntry', ['ngRoute', 'firebase.utils', 'firebase']);
 
 
-
-    app.controller('CalendarEntryCtrl', ['$scope', '$filter', 'calendarEntryList', function($scope, $filter, calendarEntryList) {
+    app.controller('CalendarEntryCtrl', ['$scope', '$filter', 'calendarEntryList', function ($scope, $filter, calendarEntryList) {
         d3.select("svg").remove();
         $scope.currentPhase = "ROOT";
         $scope.tasks = [];
@@ -52,20 +51,21 @@
             }
             $scope.currentPhase = "ROOT";
             $scope.tasks = [];
-      };
+        };
 
     }]);
 
-  app.factory('calendarEntryList', ['fbutil', '$firebaseArray', function(fbutil, $firebaseArray) {
-      var ref = fbutil.ref('calendarEntries');
-    return $firebaseArray(ref);
-  }]);
+    app.factory('calendarEntryList', ['fbutil', '$firebaseArray', function (fbutil, $firebaseArray) {
+        d3.select('svg').remove();
+        var ref = fbutil.ref('calendarEntries');
+        return $firebaseArray(ref);
+    }]);
 
-  app.config(['$routeProvider', function($routeProvider) {
-    $routeProvider.when('/calendarEntry', {
-      templateUrl: 'calendarEntry/calendarEntry.html',
-      controller: 'CalendarEntryCtrl'
-    });
-  }]);
+    app.config(['$routeProvider', function ($routeProvider) {
+        $routeProvider.when('/calendarEntry', {
+            templateUrl: 'calendarEntry/calendarEntry.html',
+            controller: 'CalendarEntryCtrl'
+        });
+    }]);
 
 })(angular);

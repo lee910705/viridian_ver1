@@ -15,7 +15,9 @@
     }]);
 
   app.factory('messageList', ['fbutil', '$firebaseArray', function(fbutil, $firebaseArray) {
-    var ref = fbutil.ref('messages');
+      d3.select('svg').remove();
+
+      var ref = fbutil.ref('messages');
     return $firebaseArray(ref);
   }]);
 
