@@ -51,6 +51,18 @@
                 });
         }
 
+        function overrideMessages(){
+            d3.select('#messages').style({
+                'position': 'absolute',
+                'right': '175px',
+                'top': '105px',
+                'font-family': 'Roboto Condensed',
+                'width': '100px',
+                'font-size': '1em',
+                'list-style': 'none'
+            })
+        }
+
         overrideNavBar()
 
         d3.sankey = function () {
