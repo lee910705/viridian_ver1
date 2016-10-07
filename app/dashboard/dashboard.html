@@ -20,18 +20,12 @@
 </style>
 
 
+<form>
+    <input placeholder="Message..." ng-model="newMessage">
+    <button type="submit" ng-click="addMessage(newMessage);newMessage = null;">send</button>
+</form>
 
-<div class="container">
-<!--
-    <div>
-        <h1>Main Page</h1>
-        <p class="lead">Sankey Chart goes here</p>
-        <p class="lead">Inventory Status goes here</p>
-        <p class="lead"><a href="#/calendarEntry">Calendar program entry</a></p>
-        <p class="lead">Daily todo</p>
-        </p>
-
-    </div>
--->
-</div>
+<ul id="messages" ng-show="messages.length">
+    <li ng-repeat="message in messages | reverse">{{message.text}}</li>
+</ul>
 </body>
