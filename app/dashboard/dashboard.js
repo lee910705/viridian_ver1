@@ -1063,7 +1063,56 @@
 
     });
 
-    var ref = new Firebase("https://viridian-49902.firebaseio.com/calendarEntries");
+    function getAndDislayMessages(){
+        var ref = new Firebase("https://viridian-49902.firebaseio.com/messages"),
+            arr = [];
+
+        ref.on('value', function(snapshot){
+            var messages = snapshot.val();
+            console.log(messages);
+            for (var messageKey in messages){
+                arr.push(messages[messageKey].text);
+            }
+
+            d3.select('#dashboardSvg')
+                .append('foreignObject')
+                .attr({
+                    'x': 700,
+                    'y': 15,
+                    'width': 250,
+                    'height': 500
+                })
+                .append('xhtml:div')
+                .style({
+                    'font-size': '2em',
+                    'font-family': 'Roboto Condensed'
+                })
+                .html(function(){
+                    var start = '<div>',
+                        end = '</div>',
+                        returnStatement = '';
+
+                    for (var i = 10; i >= 0; i--){
+                        if (arr[i]){
+                            returnStatement += start + arr[i] + end;
+                        }
+                    }
+
+                    return '<div id=\"messagesHeader\">RECENT MESSAGES</div>' + returnStatement;
+                });
+
+                d3.select('#messagesHeader')
+                    .style({
+                        'font-family': 'Roboto',
+                        'font-size': '1.2em',
+                        'font-weight': 600
+                    })
+        })
+    }
+
+    getAndDislayMessages();
+
+
 
 
 
