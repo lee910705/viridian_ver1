@@ -712,7 +712,11 @@
                                 y = yInterpolator((sankeyNodes.length - i) / sankeyNodes.length) + (svgPadding);
                             }
                             d.x += svgPadding;
-                            d.y = y + svgPadding;
+                            if (i === 0){
+                                d.y = d3.max([svgPadding * 3, y + svgPadding])
+                            } else {
+                                d.y = y + svgPadding;
+                            }
 
                             return 'translate(' + d.x + ', ' + d.y + ')';
                         },
@@ -897,13 +901,35 @@
 */
         };
 
-        // from enter on an input field write a new value for a phase in the sankey chart to firebase
+        // from enter on an input field write a new value for a phase in the sankey chart to firebase and update the vis
         $scope.setPhase = function(phase, iterator, value){
+            /*
             console.log(phase);
             console.log(iterator);
             console.log(value);
+            console.log($scope.phases);
+            */
+
+            // JJ - notice how we passed in the iterator (we called "function(d,i){}" to invoke this function),
+            // and we use it to set the variable of the array in $scope that drives the sankey:
             $scope.phases[iterator].$value = value;
-            $scope.phases.$save(iterator);
+
+            // then we hack together a ref, using our base firebase URL, phases, and the phase name
+            var ref = new Firebase("https://viridian-49902.firebaseio.com/phases/" + phase),
+                // and then get an object from this ref - this object is a promise
+                obj = $firebaseObject(ref);
+
+            // we don't need the usual $loaded() promise - instead, we just set the property on the object...
+            obj.$value = value;
+
+            // and save it. When you $save, you get a ref to the object passed back on success
+            obj.$save().then(function(ref) {
+                // this is the ref
+                // console.log(ref);
+            }, function(error) {
+                // or you get an error
+                console.log("Error:", error);
+            });
 
             // join to existing data
             var existingData = d3.selectAll('.node').data($scope.phases);
