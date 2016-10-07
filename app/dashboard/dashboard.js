@@ -3,7 +3,7 @@
 
     var app = angular.module('myApp.dashboard', ['ngRoute', 'firebase.utils', 'firebase']);
 
-    app.controller('DashboardCtrl', function ($scope, $q, $firebaseObject) {
+    app.controller('DashboardCtrl', function ($scope, $q, $firebaseObject, $firebaseArray) {
 
         /*
 
@@ -434,8 +434,8 @@
             date = d3.time.format("%Y-%m-%d"),
             percent = d3.format("+.1%");
 
-        // Load heatmap heatmap
-        function loadObjectHeatMap() {
+        // Load  heatmap
+        function loadAndRenderObjectHeatMap() {
             var objectHeatMap = [],
                 ref = new Firebase("https://viridian-49902.firebaseio.com/calendarEntries"),
                 defer = $q.defer();
@@ -533,7 +533,7 @@
                 });
                 $q.all(objectHeatMap).then(function(returnedObject){
                     $scope.objectHeatMap = returnedObject;
-                    console.log($scope.objectHeatMap);
+                    // console.log($scope.objectHeatMap);
 
                     var svg = d3.select("body").select("#dashboardSvg").select('svg.heatMap')
                         .data(d3.range(2016, 2017))
@@ -639,245 +639,299 @@
             });
         };
 
-        loadObjectHeatMap();
+        loadAndRenderObjectHeatMap();
 
         // Invoke sankey layout and append it to the svg
-        $scope.sankeyTime = function(nodes){
+        $scope.sankeyTime = function(nodesArray){
 
+            var sortIndex = {
+                'ROOT': 0,
+                'VEG': 1,
+                'FLOWER': 2,
+                'TAKEDOWN': 3,
+                'PROCESSING': 4
+                },
+                nodes = [],
+                defer = $q.defer();
+
+            console.log(nodesArray);
+
+            // sort the array
+            var sankeyNodes = nodesArray.sort(function(a,b){
+                if (sortIndex[a.$id] > sortIndex[b.$id]){
+                    return 1;
+                } else {
+                    return -1;
+                }
+            });
+
+            console.log(sankeyNodes);
+
+            // infer links from nodes
+            var links = [],
+                nodesLength = sankeyNodes.length;
+
+            for (var i = 0; i < nodesLength - 1; i++){
+                links.push({
+                    'source': i,
+                    'sourceName': sankeyNodes[i].$id,
+                    'target': i + 1,
+                    'targetName': sankeyNodes[i+1].$id,
+                    'value': sankeyNodes[i].$value
+                })
+            };
+
+            console.log(links);
+
+            // invoke sankey
             var sankeyTime = d3.sankey()
                 .nodeWidth(72)
                 .nodePadding(10)
                 .size([sankeyWidth, sankeyHeight]);
 
-            // infer links from nodes
-            var links = [],
-                nodesLength = nodes.length;
+                sankeyTime
+                    .nodes(sankeyNodes)
+                    .links(links)
+                    .layout(32);
 
-            for (var i = 0; i < nodesLength - 1; i++){
-                links.push({
-                    'source': i,
-                    'sourceName': nodes[i].phase,
-                    'target': i + 1,
-                    'targetName': nodes[i+1].phase,
-                    'value': nodes[i].value
-                })
-            };
+                var node = d3.select('#dashboardSvg').selectAll('g.node')
+                    .data(sankeyNodes).enter();
 
-            sankeyTime
-                .nodes(nodes)
-                .links(links)
-                .layout(32);
+                node.append('g')
+                    .attr({
+                        'class': 'node',
+                        'transform': function(d,i){
 
-            var node = d3.select('#dashboardSvg').selectAll('g.node')
-                .data(nodes).enter();
-
-            node.append('g')
-                .attr({
-                    'class': 'node',
-                    'transform': function(d,i){
-                        // sankey automatically adjusts to fill up svg - so we adjust heights and y by increment, here 1.6
-                        var tallestNode = d3.max(nodes, function(d){return d.dy / 1.6}),
-                            yInterpolator = d3.interpolateNumber(0, sankeyHeight - tallestNode),
-                            y = 0;
-                        if (i <= nodes.length / 2) {
-                            y = yInterpolator(i / nodes.length) + (svgPadding);
-                        } else {
-                            y = yInterpolator((nodes.length - i) / nodes.length) + (svgPadding);
-                        }
-
-                        d.x += svgPadding;
-                        d.y = y + svgPadding;
-                        return 'translate(' + d.x + ', ' + d.y + ')';
-                    },
-                    'id': function(d){return d.phase;}
-                })
-                .on('click', function(d,i){
-                    d3.select(this).append('foreignObject')
-                        .attr({
-                            'x': svgPadding / 4,
-                            'y': svgPadding * 3,
-                            'height': svgPadding * 1.1,
-                            'width': function(d){return d.dx;},
-                            'id': function(d){return d.phase + 'ForeignObject';}
-                        })
-                        .append('xhtml:div')
-                        .html(function(d){
-                            return '<input id=\'' + d.phase + 'Input\'><\/input>';
-                        });
-
-                    d3.select(this).selectAll('input')
-                        .style({
-                            'background-color': 'rgba(0,0,0,0)',
-                            'height': svgPadding * 1.05,
-                            'font-size': svgPadding,
-                            'font-weight': '500',
-                            'width': '62px',
-                            'border-style': 'none',
-                            'padding': '0px 0px 0px 0px',
-                            'margin': '0px 0px 0px 0px',
-                            '-webkit-appearance': 'none',
-                            'border-bottom': '1px solid black',
-                        })
-                        .on('keydown', function () {
-
-                            if (d3.event.keyCode === 13) {
-                                var newValue = document.getElementById(d3.event.srcElement.id).value,
-                                    parentGroupElementForThisInput = d3.event.path[3].id; // e.g. the <g> '#ROOT'
-                                $scope.setPhase(parentGroupElementForThisInput, newValue);
-                                d3.select(this).remove();
+                            // sankey automatically adjusts to fill up svg - so we adjust heights and y by increment, here 1.6
+                            var tallestNode = d3.max(sankeyNodes, function(d){return d.$value * 10}),
+                                yInterpolator = d3.interpolateNumber(0, sankeyHeight - tallestNode - svgPadding * 4),
+                                y = 0;
+                            if (i <= nodes.length / 2) {
+                                y = yInterpolator(i / sankeyNodes.length + 1) - (svgPadding);
+                            } else {
+                                y = yInterpolator((sankeyNodes.length - i) / sankeyNodes.length) + (svgPadding);
                             }
+                            d.x += svgPadding;
+                            d.y = y + svgPadding;
 
-                            if (d3.event.keyCode === 27) {
-                                d3.select(this).remove();
-                            }
+                            return 'translate(' + d.x + ', ' + d.y + ')';
+                        },
+                        'id': function(d){return d.$id;}
+                    })
+                    .on('click', function(d,i){
+                        var phase = d.$id,
+                            iterator = i;
 
-                            if (d3.event.keyCode === 9) {
-                                d3.select(this).remove();
-                            }
+                        d3.select(this).append('foreignObject')
+                            .attr({
+                                'x': svgPadding / 4,
+                                'y': svgPadding * 3,
+                                'height': 45,
+                                'width': function(d){return d.dx;},
+                                'id': function(d){return d.$id + 'ForeignObject';}
+                            })
+                            .append('xhtml:div')
+                            .html(function(d){
+                                return '<input id=\'' + d.$id + 'Input\'><\/input>';
+                            });
 
-                        })
-                        .on('blur', function () {
-                            var parentGroup = d3.event.path[3].id; // e.g. the <g> '#ROOT'
-                            console.log(parentGroup);
+                        d3.select(this).selectAll('input')
+                            .style({
+                                'background-color': 'rgba(0,0,0,0)',
+                                'height': 45,
+                                'font-size': '3em',
+                                'font-weight': '500',
+                                'width': '62px',
+                                'border-style': 'none',
+                                'padding': '0px 0px 0px 0px',
+                                'margin': '0px 0px 0px 0px',
+                                '-webkit-appearance': 'none',
+                                'border-bottom': '1px solid black',
+                            })
+                            .on('keydown', function () {
 
-                            if (d3.event.keyCode !== 13 || d3.event.keyCode !== 27 || d3.event.keyCode !== 9){
+                                if (d3.event.keyCode === 13) {
+                                    var newValue = document.getElementById(d3.event.srcElement.id).value,
+                                        parentGroupElementForThisInput = d3.event.path[3].id; // e.g. the <g> '#ROOT'
+                                    $scope.setPhase(phase, iterator, newValue);
+                                    d3.select('#' + phase).selectAll('input').remove();
+                                }
 
-                                if (!(d3.select('#' + parentGroup + 'ForeignObject').empty())){
-                                    d3.selectAll('#' + parentGroup + 'ForeignObject').remove()
-                                };
+                                if (d3.event.keyCode === 27) {
+                                    d3.select('#' + phase).selectAll('input').remove();
+                                }
 
-                            }
-                        });
+                                if (d3.event.keyCode === 9) {
+                                    d3.select('#' + phase).selectAll('input').remove();
+                                }
 
-                })
-                // .call(d3.behavior.drag())
-                .append("rect")
-                .attr("height", function(d) {
-                    var newHeight = d.dy / 1.6; // magic number 1.6 again
-                    d.dy = newHeight;
-                    return d.dy;
-                })
-                .attr("width", sankeyTime.nodeWidth())
-                .style("fill", function(d,i) {
-                    return $scope.colors(i);
-                });
+                            })
+                            .on('blur', function () {
+                                d3.select('#' + phase).selectAll('foreignObject').remove();
 
-            var link = d3.select('#dashboardSvg').selectAll(".link")
-                .data(links).enter()
-                .append("path")
-                .attr("d", function(d){
-                    return generateLines(d);
-                })
-                .attr('class', 'link')
-                .style({
-                    'fill': function(d,i){return $scope.colors(i);},
-                    'fill-opacity': 0.8
-                });
+                                /*
+                                var parentGroup = d3.event.path[3].id; // e.g. the <g> '#ROOT'
 
-            d3.selectAll('.node').append("text")
-                .attr({
-                    'x': function(d){return 0 - d.dy},
-                    'y': 20,
-                    'font-family': 'Roboto',
-                    'font-size': svgPadding,
-                    'fill-opacity': 0.4,
-                    'font-weight': 600,
-                    'class': 'phaseLabel',
-                    'transform': 'rotate(270)'
-                })
-                .text(function(d) { return d.phase; });
+                                if (d3.event.keyCode !== 13 || d3.event.keyCode !== 27 || d3.event.keyCode !== 9){
 
-            d3.selectAll('.node').append("text")
-                .attr({
-                    'x': 35,
-                    'y': 15,
-                    'dy': 12,
-                    'font-family': 'Roboto',
-                    'font-size': '3em',
-                    'fill-opacity': 0.4,
-                    'font-weight': 600,
-                    'class': 'phaseValue'
-                })
-                .text(function(d) { return d.value; });
+                                    if (!(d3.select('#' + parentGroup + 'ForeignObject').empty())){
+                                        d3.selectAll('#' + parentGroup + 'ForeignObject').remove()
+                                    };
+
+                                }
+                                */
+                            });
+
+                    })
+                    // .call(d3.behavior.drag())
+                    .append("rect")
+                    .attr("height", function(d) {
+                        d.dy = d.$value * 10;
+                        return d.dy;
+                    })
+                    .attr("width", sankeyTime.nodeWidth())
+                    .style("fill", function(d,i) {
+                        return $scope.colors(i);
+                    });
+
+                var link = d3.select('#dashboardSvg').selectAll(".link")
+                    .data(links).enter()
+                    .append("path")
+                    .attr("d", function(d){
+                        return generateLines(d);
+                    })
+                    .attr('class', 'link')
+                    .style({
+                        'fill': function(d,i){return $scope.colors(i);},
+                        'fill-opacity': 0.8
+                    });
+
+                d3.selectAll('.node').append("text")
+                    .attr({
+                        'x': function(d){return 0 - d.dy},
+                        'y': 20,
+                        'font-family': 'Roboto',
+                        'font-size': svgPadding,
+                        'fill-opacity': 0.4,
+                        'font-weight': 600,
+                        'class': 'phaseLabel',
+                        'transform': 'rotate(270)'
+                    })
+                    .text(function(d) { return d.$id; });
+
+                d3.selectAll('.node').append("text")
+                    .attr({
+                        'x': 35,
+                        'y': 15,
+                        'dy': 12,
+                        'font-family': 'Roboto',
+                        'font-size': '3em',
+                        'fill-opacity': 0.4,
+                        'font-weight': 600,
+                        'class': 'phaseValue'
+                    })
+                    .text(function(d) { return d.$value; });
+
         };
 
-        // get sankey data
+        // get sankey data and invoke $scope.sankeyTime
         function getSankeyDataAndRender(){
-            var phasesRef = new Firebase("https://viridian-49902.firebaseio.com/phases/"),
-                phases = {},
-                nodes = [
-                    {'phase': 'ROOT', 'value': 0 },
-                    {'phase': 'VEG', 'value': 0 },
-                    {'phase': 'FLOWER', 'value': 0 },
-                    {'phase': 'TAKEDOWN', 'value': 0 },
-                    {'phase': 'PROCESSING', 'value': 0 },
-                ],
-                fbObj = $firebaseObject(phasesRef),
-                returnedArr = [];
+            var phaseList = $firebaseArray(new Firebase("https://viridian-49902.firebaseio.com/phases/"));
 
-            fbObj.$loaded().then(function(data){
+            phaseList.$loaded().then(function(list){
+                $scope.phases = list;
+
+                $scope.sankeyTime($scope.phases);
+            });
+/*
+            var phaseNames = ['ROOT', 'VEG', 'FLOWER', 'TAKEDOWN', 'PROCESSING'],
+                nodes = [],
+                phasesRef = new Firebase("https://viridian-49902.firebaseio.com/phases/"),
+                fbObj = $firebaseObject(phasesRef),
+                returnedArr = [],
+                deferred = $q.defer(),
+                phasesSyncObject = $firebaseObject(phasesRef),
+                i = 0,
+                phasesLength = phaseNames.length;
+
+            for (i = 0; i < phasesLength; i++){
+                var valueRef = new Firebase("https://viridian-49902.firebaseio.com/phases/" + phaseNames[i]),
+                    valueSyncObj = $firebaseObject(valueRef);
+
+                valueSyncObj.$loaded().then(function(data){
+                    console.log(data.$id + ' has value at line 842 of ' + data.$value);
+                    returnedArr.push({
+                        'phase': data.$id,
+                        'value': data.$value
+                    });
+                    return returnedArr;
+                }).then(function(sortedArray){
+                    console.log(sortedArray);
+                });
+            }
+
+
+            // make a sync object and wait for it to be loaded, guaranteeing that the above operation has also concluded
+            phasesSyncObject.$loaded().then(function(data){
+                console.log(returnedArr);
+
+                $scope.sankeyTime(returnedArr);
+
+            });
+*/
+/*
+            // get a snapshot of the data at this location
+            phasesRef.on('value', function(snapshot){
+                $scope.phases = snapshot.val();
+                deferred.resolve(phases);
+                return $scope.phases;
+            });
+
+            // make a sync object and wait for it to be loaded, guaranteeing that the above operation has also concluded
+            phasesSyncObject.$loaded().then(function(data){
                 console.log(data);
 
-                for (var phaseName in data){
-                    for (var i = 0; i < nodes.length; i++){
-                        if (phaseName.toString() === nodes[i].phase.toString()){
-                            console.log(i + ' value of ' + nodes[i].value + ' for phase ' + nodes[i].phase + ' adding value of ' + data[phaseName]);
-                            nodes[i].value = data[phaseName];
-                            console.log(nodes[i]);
-                        }
-                    }
-                };
+                $scope.sankeyTime(Object.keys(data));
 
-                return nodes;
-
-            }).then(function(returnedArr){
-
-                setTimeout($scope.sankeyTime(returnedArr), 5550);
-
-                return $scope.nodes;
-            })
+            });
+*/
         };
 
         // from enter on an input field write a new value for a phase in the sankey chart to firebase
-        $scope.setPhase = function(phase, value){
-            var phasesRef = new Firebase("https://viridian-49902.firebaseio.com/phases/"),
-                phaseRef = phasesRef.child(phase),
-                i = 0,
-                nodesLength = $scope.nodes.length,
-                links = [];
-
-            // update the local data
-            for (i = 0; i < nodesLength; i++){
-                if ($scope.nodes[i].phase === phase){
-                    $scope.nodes[i].value = value;
-                    $scope.nodes[i].dy = value;
-                }
-            }
+        $scope.setPhase = function(phase, iterator, value){
+            console.log(phase);
+            console.log(iterator);
+            console.log(value);
+            $scope.phases[iterator].$value = value;
+            $scope.phases.$save(iterator);
 
             // join to existing data
-            var existingData = d3.selectAll('.node').data($scope.nodes);
+            var existingData = d3.selectAll('.node').data($scope.phases);
 
             // update rect heights
             existingData.selectAll('rect').transition()
-                .attr('height', function(d){
+                .attr("height", function(d) {
+                    d.dy = d.$value * 10;
                     return d.dy;
                 });
 
+            var links = [];
+            console.log($scope.phases);
             // generate new links array
-            for (var i = 0; i < nodesLength - 1; i++){
+            for (var i = 0; i < $scope.phases.length - 1; i++){
                 links.push({
-                    'source': $scope.nodes[i],
-                    'sourceName': $scope.nodes[i].phase,
-                    'target': $scope.nodes[i + 1],
-                    'targetName': $scope.nodes[i+1].phase,
-                    'value': $scope.nodes[i].value
+                    'source': $scope.phases[i],
+                    'sourceName': $scope.phases[i].$id,
+                    'target': $scope.phases[i + 1],
+                    'targetName': $scope.phases[i+1].$id,
+                    'value': $scope.phases[i].$value
                 })
             };
             console.log(links);
 
             // re-calculate lines
             d3.selectAll('.link').data(links).transition().duration(1000)
-                .attr('d', function(d){return generateLines(d)})
+                .attr('d', function(d){return generateLines(d)});
 
             // move the text up
             d3.selectAll('.phaseLabel').transition().duration(1000)
@@ -885,9 +939,10 @@
 
             // change the value text
             d3.selectAll('.phaseValue').transition().duration(1000)
-                .text(function(d){ return d.value; })
+                .text(function(d, i){
+                    return d.$value;
+                });
 
-            console.log(phaseRef);
             // phaseRef.child(phase).set(value);
 
         };
