@@ -3,19 +3,9 @@
 
     var app = angular.module('myApp.dashboard', ['ngRoute', 'firebase.utils', 'firebase']);
 
-<<<<<<< HEAD
-    app.controller('DashboardCtrl', function ($scope, $q, messageList, $firebaseObject) {
-
-        $scope.messages = messageList;
-        $scope.addMessage = function (newMessage) {
-            console.log("called");
-            if (newMessage) {
-                $scope.messages.$add({ text: newMessage });
-            }
-        };
-=======
     app.controller('DashboardCtrl', function ($scope, $q, $firebaseObject, $firebaseArray) {
->>>>>>> origin/master
+
+        d3.select("svg").remove();
 
         /*
 
@@ -429,42 +419,6 @@
                 if (objArray[i]["day"] == day) return objArray[i]["task"];
             }
         }
-<<<<<<< HEAD
-
-
-        var snapshot = $firebaseObject(ref);
-        var defer = $q.defer();
-
-        /*
-
-        Primary run sequenced - scheduled using $q.all()
-
-        */
-
-        // Load the heatmap data and append it to svg
-        ref.on("value", function (snapshot) {
-            angular.forEach(snapshot.val(), function (entry) {
-                console.log("data downloaded");
-                console.log(snapshot.val());
-                var date = $scope.createDate(entry["startDate"]);
-                var maxROOT = $scope.getMax(entry["ROOT"]);
-                var maxVEG = $scope.getMax(entry["VEG"]);
-                var maxFLOWER = $scope.getMax(entry["FLOWER"]);
-                var maxTRIM = $scope.getMax(entry["TRIM"]);
-
-
-                for (var i = 0; i < maxROOT; i++) {
-                    var tempObj = {};
-                    tempObj["date"] = new Date(date);
-                    tempObj["phase"] = "ROOT"
-                    if (entry.hasOwnProperty("ROOT")) {
-                        if ($scope.dayExists(entry["ROOT"], i + 1)) {
-                            tempObj["hours"] = $scope.getDay(entry["ROOT"], i + 1);
-                            tempObj["task"] = $scope.getTask(entry["ROOT"], i + 1);
-                        } else {
-                            tempObj["hours"] = null;
-                            tempObj["task"] = null;
-=======
         function monthPath(t0) {
             var t1 = new Date(t0.getFullYear(), t0.getMonth() + 1, 0),
                 d0 = +day(t0), w0 = +week(t0),
@@ -509,7 +463,6 @@
                                 tempObj["hours"] = null;
                                 tempObj["task"] = null;
                             }
->>>>>>> origin/master
                         }
                         objectHeatMap.push(tempObj);
                         defer.resolve(objectHeatMap[tempObj]);
@@ -686,54 +639,7 @@
                         });
                 })
             });
-<<<<<<< HEAD
-            defer.resolve(objectHeatMap);
-            $q.all(objectHeatMap).then(function () {
-
-                /*
-
-                Calendar heat map
-
-                */
-
-
-                var margin = {top: 5.5, right: 0, bottom: 5.5, left: 19.5},
-                    width = 960 - margin.left - margin.right,
-                    height = 130 - margin.top - margin.bottom,
-                    size = height / 7,
-                    svgPadding = 25,
-                    svgWidth = d3.max([window.innerWidth,1024]),       // target tablet resolution
-                    svgHeight = d3.max([window.innerHeight,768]),
-                    sankeyHeight = svgHeight / 1.8,
-                    sankeyWidth = svgWidth / 1.6;
-
-                var day = function (d) {
-                        return (d.getDay() + 6) % 7;
-                    }, // monday = 0
-                    week = d3.time.format("%W"), // monday-based week number
-                    date = d3.time.format("%Y-%m-%d"),
-                    percent = d3.format("+.1%");
-
-                var color = d3.scale.quantize()
-                    .domain([-.05, .05])
-                    //.range(d3.range(4));
-                    .range(d3.range(4).map(function (d) {
-                        if (d === "ROOT") {
-                            return 0;
-                        }
-                        if (d === "VEG") {
-                            return 1;
-                        }
-                        if (d === "FLOWER") {
-                            return 2;
-                        }
-                        if (d === "TRIM") {
-                            return 3;
-                        }
-                    }));
-=======
         };
->>>>>>> origin/master
 
         loadAndRenderObjectHeatMap();
 
@@ -1121,12 +1027,6 @@
     });
 
     var ref = new Firebase("https://viridian-49902.firebaseio.com/calendarEntries");
-
-    app.factory('messageList', ['fbutil', '$firebaseArray', function (fbutil, $firebaseArray) {
-        var ref = fbutil.ref('messages').limitToLast(10);
-        return $firebaseArray(ref);
-    }]);
-
 
     app.config(['$routeProvider', function ($routeProvider) {
         $routeProvider.when('/dashboard', {
