@@ -1027,7 +1027,8 @@
             .style({
                 'position': 'absolute',
                 'left': '0px',
-                'top': '50px'
+                'top': '50px',
+                'background-color': 'rgba(128,128,128,0.25)'
             });
 
         d3.select('#dashboardSvg')
@@ -1088,7 +1089,7 @@
                     'font-family': 'Roboto Condensed, Helvetica'
                 })
                 .html(function(){
-                    var start = '<div>',
+                    var start = '<div class=\"chatMessage\">',
                         end = '</div>',
                         returnStatement = '';
 
@@ -1106,7 +1107,13 @@
                         'font-family': 'Roboto, Helvetica',
                         'font-size': '1.2em',
                         'font-weight': 600
+                    });
+
+                d3.selectAll('.chatMessage')
+                    .style({
+                        'padding-bottom': '5px'
                     })
+
         })
     }
 
