@@ -5,6 +5,8 @@
 
     app.controller('DashboardCtrl', function ($scope, $q, $firebaseObject, $firebaseArray) {
 
+        d3.select("svg").remove();
+
         /*
 
         Format stuff - mostly overriding bootstrap
