@@ -6,8 +6,7 @@ angular.module('myApp', [
     'myApp.dashboard',
     'myApp.runoff',
     'myApp.calendarEntry',
-    'myApp.chat',
-    'myApp.status'
+    'myApp.chat'
 ])
   
   .config(['$routeProvider', function ($routeProvider) {
