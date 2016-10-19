@@ -8,7 +8,7 @@ angular.module('myApp.config', [])
   .constant('version', '1.0.0')
 
   // where to redirect users if they need to authenticate (see security.js)
-//  .constant('loginRedirectPath', '/login')
+  .constant('loginRedirectPath', '/login')
 
   // your Firebase data URL goes here, no trailing slash
   .constant('FBURL', 'https://viridian-49902.firebaseio.com')

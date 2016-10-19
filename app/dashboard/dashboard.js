@@ -667,7 +667,7 @@
                 nodes = [],
                 defer = $q.defer();
 
-            console.log(nodesArray);
+            //console.log(nodesArray);
 
             // sort the array
             var sankeyNodes = nodesArray.sort(function(a,b){
@@ -678,7 +678,7 @@
                 }
             });
 
-            console.log(sankeyNodes);
+            //console.log(sankeyNodes);
 
             // infer links from nodes
             var links = [],
@@ -694,7 +694,7 @@
                 })
             };
 
-            console.log(links);
+            //console.log(links);
 
             // invoke sankey
             var sankeyTime = d3.sankey()
@@ -955,7 +955,7 @@
                 });
 
             var links = [];
-            console.log($scope.phases);
+            //console.log($scope.phases);
             // generate new links array
             for (var i = 0; i < $scope.phases.length - 1; i++){
                 links.push({
@@ -966,7 +966,7 @@
                     'value': $scope.phases[i].$value
                 })
             };
-            console.log(links);
+            //console.log(links);
 
             // re-calculate lines
             d3.selectAll('.link').data(links).transition().duration(1000)
@@ -1062,15 +1062,13 @@
 
         getSankeyDataAndRender();
 
-    });
-
-    function getAndDislayMessages(){
+    function getAndDisplayMessages(){
         var ref = new Firebase("https://viridian-49902.firebaseio.com/messages"),
             arr = [];
 
         ref.on('value', function(snapshot){
             var messages = snapshot.val();
-            console.log(messages);
+            //console.log(messages);
             for (var messageKey in messages){
                 arr.push(messages[messageKey].text);
             }
@@ -1078,7 +1076,7 @@
             d3.select('#dashboardSvg')
                 .append('foreignObject')
                 .attr({
-                    'x': 700,
+                    'x': 1100,
                     'y': 15,
                     'width': 250,
                     'height': 500
@@ -1117,10 +1115,9 @@
         })
     }
 
-    getAndDislayMessages();
+    getAndDisplayMessages();
 
-
-
+    });
 
 
     app.config(['$routeProvider', function ($routeProvider) {

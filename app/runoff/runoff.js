@@ -5,6 +5,7 @@
 
     app.controller('RunOffCtrl', ['$scope', 'runoffList', function ($scope, runoffList) {
         d3.select("svg").remove();
+        d3.select("svg").remove();
 
         $scope.runoffs = runoffList;
         $scope.addrunoff = function (newDATE, newINPT, newPREF, newPH, newEC) {

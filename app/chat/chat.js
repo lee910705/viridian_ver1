@@ -5,6 +5,8 @@
 
   app.controller('ChatCtrl', ['$scope', 'messageList', function($scope, messageList) {
       d3.select('svg').remove();
+      d3.select('svg').remove();
+
       $scope.messages = messageList;
       $scope.addMessage = function (newMessage) {
           console.log("called");
@@ -15,8 +17,6 @@
     }]);
 
   app.factory('messageList', ['fbutil', '$firebaseArray', function(fbutil, $firebaseArray) {
-      d3.select('svg').remove();
-
       var ref = fbutil.ref('messages');
     return $firebaseArray(ref);
   }]);
